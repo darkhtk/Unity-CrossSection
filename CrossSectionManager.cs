@@ -51,7 +51,7 @@ public partial class CrossSectionManager : MonoBehaviour, IUIChecker
     [SerializeField] private TMP_InputField _startText;
     [SerializeField] private TMP_InputField _endText;
     [SerializeField] private Scrollbar _scrollBarHorizontal;
-    [SerializeField] private Scrollbar _scrollBarVeritcal;
+    [SerializeField] private Scrollbar _scrollBarVertical;
     [SerializeField] private Slider _sliderSize;
     [SerializeField] private Slider _sliderLineWidth;
     [SerializeField] private GameObject _dimPanel;
@@ -305,7 +305,6 @@ public partial class CrossSectionManager : MonoBehaviour, IUIChecker
         {
             var crossSections = _crossSections.Where(w => w.IsReady);
             _totalCount = crossSections.Count();
-            _currentCount++;
 
             foreach (var crossSection in crossSections)
             {
@@ -520,7 +519,7 @@ public partial class CrossSectionManager : MonoBehaviour, IUIChecker
             CrossSectionDraw.Instance.VisibleStation(_currentCrossSection.Station);
             foreach (var crossSection in _crossSections)
             {
-                crossSection.Visibie(_currentCrossSection == crossSection);
+                crossSection.Visible(_currentCrossSection == crossSection);
             }
         }
         else
@@ -530,7 +529,7 @@ public partial class CrossSectionManager : MonoBehaviour, IUIChecker
             {
                 foreach (var crossSection in _crossSections)
                 {
-                    crossSection.Visibie(true);
+                    crossSection.Visible(true);
                 }
             }
         }
@@ -567,12 +566,21 @@ public partial class CrossSectionManager : MonoBehaviour, IUIChecker
         {
             case ModelTypes.MtCutSlope:
             case ModelTypes.MtFillSlope:
-                return $"1:{Mathf.Abs(vector.x / vector.y): 0.0}";
+                if (Mathf.Approximately(vector.y, 0))
+                    return string.Empty;
+                else
+                    return $"1:{Mathf.Abs(vector.x / vector.y): 0.0}";
             case ModelTypes.MtRoadSurface:
-                return $"{Mathf.Abs(vector.y / vector.x) * 100: 0.00}%";
+                if (Mathf.Approximately(vector.x, 0))
+                    return string.Empty;
+                else
+                    return $"{Mathf.Abs(vector.y / vector.x) * 100: 0.00}%";
         }
 
-        return $"{Mathf.Abs(vector.x / vector.y): 0.0}";
+        if (Mathf.Approximately(vector.y, 0))
+            return string.Empty;
+        else
+            return $"{Mathf.Abs(vector.x / vector.y): 0.0}";
     }
 
     private static string SlopeTextByModelType(ModelTypes modelType, Vector3 v0, Vector3 v1)

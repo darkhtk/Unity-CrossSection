@@ -22,7 +22,7 @@ public partial class CrossSectionManager : MonoBehaviour, IUIChecker
         public Quaternion Rotation;
     }
 
-    //µµ·Î¼±Çü ±³Â÷ µ¥ÀÌÅÍ
+    //ï¿½ï¿½ï¿½Î¼ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     internal class AlignmentInfoIntersection
     {
         public WBAlignmentInfo AlignmentInfo;
@@ -58,7 +58,7 @@ public partial class CrossSectionManager : MonoBehaviour, IUIChecker
         }
     }
 
-    //Dim : °¢ MeshInfo¿¡ ÇØ´çÇÏ´Â ¼± ±×·ì
+    //Dim : ï¿½ï¿½ MeshInfoï¿½ï¿½ ï¿½Ø´ï¿½ï¿½Ï´ï¿½ ï¿½ï¿½ ï¿½×·ï¿½
     internal class MeshLine2D
     {
         public MeshInfo MeshInfo;
@@ -438,21 +438,21 @@ public partial class CrossSectionManager : MonoBehaviour, IUIChecker
         {
             if (crossSection.MeshLines2D?.Count > 0 is false) return;
 
-            //À¯È¿ÇÑ 2D ¼±¸¸ Ãß¸²
+            //ï¿½ï¿½È¿ï¿½ï¿½ 2D ï¿½ï¿½ï¿½ï¿½ ï¿½ß¸ï¿½
             var crossSectionLines = crossSection.MeshLines2D.Where(w => w.IsValuable).ToList();
             minX = crossSectionLines.Min(m => m.MinX);
             maxX = crossSectionLines.Max(m => m.MaxX);
             minY = crossSectionLines.Min(m => m.MinY);
             maxY = crossSectionLines.Max(m => m.MaxY);
 
-            //¼±
+            //ï¿½ï¿½
             pointsList = new();
             foreach (var lines in crossSectionLines.Select(s => s.PointsList))
             {
                 pointsList.AddRange(lines);
             }
 
-            //Á¡
+            //ï¿½ï¿½
             vertices2D = new();
             foreach (var line in pointsList)
             {
@@ -460,7 +460,7 @@ public partial class CrossSectionManager : MonoBehaviour, IUIChecker
             }
             vertices2D = vertices2D.Distinct().ToList();
 
-            //2D ÀüÃ¼ Å©±â¿¡ ¸Â°Ô rect Á¶Àı
+            //2D ï¿½ï¿½Ã¼ Å©ï¿½â¿¡ ï¿½Â°ï¿½ rect ï¿½ï¿½ï¿½ï¿½
             contentRect.sizeDelta = rate * 0.5f * new Vector2(maxX - minX, maxY - minY) + new Vector2(minX + maxX, minY + maxY) / 2;
 
             for (int i = 0; i < crossSectionLines.Count; i++)
@@ -566,7 +566,7 @@ public partial class CrossSectionManager : MonoBehaviour, IUIChecker
                 }
             }
 
-            //¼±Çü ±³Â÷Á¡ µ¥ÀÌÅÍ
+            //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
             foreach (var alignmentInfoIntersection in crossSection.AlignmentInfoIntersections)
             {
                 foreach (var pair in alignmentInfoIntersection.IntersectionPairs)
@@ -578,7 +578,7 @@ public partial class CrossSectionManager : MonoBehaviour, IUIChecker
                 }
             }
 
-            //ÇØ´çµÇ´Â ·¹ÀÌ¾î ¸®½ºÆ®¾÷
+            //ï¿½Ø´ï¿½Ç´ï¿½ ï¿½ï¿½ï¿½Ì¾ï¿½ ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½
             layerToggles = new();
             var modelTypes = entities?.Select(s => s.ModelType)?.Distinct().ToList();
             if (modelTypes?.Count > 0)
@@ -622,7 +622,7 @@ public partial class CrossSectionManager : MonoBehaviour, IUIChecker
         }
 
         /// <summary>
-        /// ModelType¿¡ µû¸¥ °æ»çµµ ÅØ½ºÆ® Ãß°¡
+        /// ModelTypeï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½çµµ ï¿½Ø½ï¿½Æ® ï¿½ß°ï¿½
         /// </summary>
         /// <param name="modelType"></param>
         /// <param name="vertices"></param>
@@ -1048,7 +1048,7 @@ public partial class CrossSectionManager : MonoBehaviour, IUIChecker
             return planePosition - mousePosition.x * planeForward + mousePosition.y * Vector3.up;
         }
 
-        public void Visibie(bool enable)
+        public void Visible(bool enable)
         {
             foreach (var go in gos)
             {
@@ -1058,10 +1058,16 @@ public partial class CrossSectionManager : MonoBehaviour, IUIChecker
 
         private bool DoesBoundsIntersectPlane(Vector3[] vertices)
         {
+            bool hasPositive = false;
+            bool hasNegative = false;
+
             foreach (Vector3 vertex in vertices)
             {
-                if (Vector3.Dot(vertex - planePosition, planeNormal) > 0f)
-                    return true;
+                float dot = Vector3.Dot(vertex - planePosition, planeNormal);
+                if (dot > 0f) hasPositive = true;
+                else hasNegative = true;
+
+                if (hasPositive && hasNegative) return true;
             }
 
             return false;
@@ -1070,7 +1076,7 @@ public partial class CrossSectionManager : MonoBehaviour, IUIChecker
 
         #region Generate
         /// <summary>
-        /// À¯È¿ÇÑ MeshInfo¿ÍÀÇ ±³¼± Å½»öÈÄ ALine Ãß°¡
+        /// ï¿½ï¿½È¿ï¿½ï¿½ MeshInfoï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Å½ï¿½ï¿½ï¿½ï¿½ ALine ï¿½ß°ï¿½
         /// </summary>
         /// <param name="meshInfos"></param>
         /// <returns></returns>
@@ -1084,7 +1090,7 @@ public partial class CrossSectionManager : MonoBehaviour, IUIChecker
             Destroy(crossSectionSphere0.gameObject);
             Destroy(crossSectionSphere1.gameObject);
 
-            //Æò¸é°ú °£¼·µÇ´Â ¸ğµç MeshInfoÀÇ ±³¼± °è»ê
+            //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ç´ï¿½ ï¿½ï¿½ï¿½ MeshInfoï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
             foreach (var meshInfo in meshInfos.Where(w => DoesBoundsIntersectPlane(w.BoundsVertices)))
             {
                 Color color = Color.white;
@@ -1094,7 +1100,7 @@ public partial class CrossSectionManager : MonoBehaviour, IUIChecker
                 MakeData(meshInfo, color);
             }
 
-            //Ãß°¡ MeshInfoÀÇ ±³¼± °è»ê
+            //ï¿½ß°ï¿½ MeshInfoï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
             if (additionalMeshInfos?.Count > 0)
             {
                 Dictionary<ModelTypes, List<Vector3[]>> verticesDic = new();
@@ -1108,7 +1114,7 @@ public partial class CrossSectionManager : MonoBehaviour, IUIChecker
                     verticesDic.Add(meshInfo.ModelType, verticesList);
                 }
 
-                ////Åä»ç ¸®ÇÎ »çÀÌ mesh
+                ////ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ mesh
                 //{
                 //    if (verticesDic.TryGetValue(ModelTypes.MtTerrain, out var soilVerticesList) &&
                 //        verticesDic.TryGetValue(ModelTypes.MtRippingSurface, out var rippingVerticesList))
@@ -1131,7 +1137,7 @@ public partial class CrossSectionManager : MonoBehaviour, IUIChecker
                 //    }
                 //}
 
-                ////¸®ÇÎ ¹ßÆÄ »çÀÌ mesh
+                ////ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ mesh
                 //{
                 //    if (verticesDic.TryGetValue(ModelTypes.MtRippingSurface, out var rippingVerticesList) &&
                 //        verticesDic.TryGetValue(ModelTypes.MtBlastingSurface, out var blastingVerticesList))
@@ -1191,7 +1197,7 @@ public partial class CrossSectionManager : MonoBehaviour, IUIChecker
                     var currStationPoint = alignmentInfo.StationPoints[i];
                     var nextStationPoint = alignmentInfo.StationPoints[i + 1];
 
-                    Vector3 lineDirection = (nextStationPoint.Position - currStationPoint.Position).normalized;
+                    Vector3 lineDirection = nextStationPoint.Position - currStationPoint.Position;
                     float denominator = Vector3.Dot(planeNormal, lineDirection);
 
                     // Check if the line and plane are not parallel
@@ -1203,11 +1209,9 @@ public partial class CrossSectionManager : MonoBehaviour, IUIChecker
                             var point = currStationPoint.Position + t * lineDirection;
                             if (!intersectionPairs.Exists(e => Vector3.Distance(e.point, point) < 1f))
                             {
-                                var vector0 = point0 - point;
-                                vector0.y = 0;
-                                var vector1 = point1 - point;
-                                vector1.y = 0;
-                                if (vector0.normalized != vector1.normalized)
+                                var vector0 = (point0 - point).ToFlatVector();
+                                var vector1 = (point1 - point).ToFlatVector();
+                                if (Vector3.Dot(vector0.normalized, vector1.normalized) < 0)
                                 {
                                     intersectionPairs.Add((point, currStationPoint.Station + t * (nextStationPoint.Station - currStationPoint.Station)));
                                 }
@@ -1241,7 +1245,7 @@ public partial class CrossSectionManager : MonoBehaviour, IUIChecker
         }
 
         /// <summary>
-        /// ÇØ´ç MeshInfo¿Í PlaneÀÇ ¸ğµç ±³¼±À» ÀÌ¾îÁø °Íµé³¢¸® Grouping ÈÄ µ¥ÀÌÅÍ »ı¼º
+        /// ï¿½Ø´ï¿½ MeshInfoï¿½ï¿½ Planeï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ì¾ï¿½ï¿½ï¿½ ï¿½Íµé³¢ï¿½ï¿½ Grouping ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         /// </summary>
         /// <param name="meshInfo"></param>
         /// <param name="color"></param>
@@ -1294,90 +1298,71 @@ public partial class CrossSectionManager : MonoBehaviour, IUIChecker
             #endregion
 
             #region Grouping
-            //ÀÌ¾îÁø ±³¼±³¢¸® ±×·çÇÎ
+            // ì—°ê²°ëœ ì„¸ê·¸ë¨¼íŠ¸ë¥¼ ê·¸ë£¹í•‘ (multi-passë¡œ ë¹„ìˆœì°¨ ì„¸ê·¸ë¨¼íŠ¸ë„ ì—°ê²° ë³´ì¥)
             List<List<List<Vector3>>> groups = new();
-            List<List<Vector3>> currentGroup = new();
-            while (intersections.Count > 0)
+            foreach (var seg in intersections)
             {
-                if (currentGroup.Count == 0)
+                int headMatch = -1;
+                int tailMatch = -1;
+                bool headReverse = false;
+                bool tailReverse = false;
+
+                for (int g = 0; g < groups.Count; g++)
                 {
-                    currentGroup.Add(intersections[0]);
-                    intersections.RemoveAt(0);
+                    var group = groups[g];
+                    if (headMatch < 0)
+                    {
+                        if (VertexEqual(group.Last().Last(), seg.First())) { headMatch = g; headReverse = false; }
+                        else if (VertexEqual(group.Last().Last(), seg.Last())) { headMatch = g; headReverse = true; }
+                    }
+                    if (tailMatch < 0 && g != headMatch)
+                    {
+                        if (VertexEqual(group.First().First(), seg.Last())) { tailMatch = g; tailReverse = false; }
+                        else if (VertexEqual(group.First().First(), seg.First())) { tailMatch = g; tailReverse = true; }
+                    }
+                }
+
+                if (headMatch >= 0 && tailMatch >= 0)
+                {
+                    // ì„¸ê·¸ë¨¼íŠ¸ê°€ ë‘ ê·¸ë£¹ì„ ì´ì–´ì¤Œ â†’ ë³‘í•©
+                    var segToAdd = headReverse ? seg.AsEnumerable().Reverse().ToList() : seg;
+                    groups[headMatch].Add(segToAdd);
+                    groups[headMatch].AddRange(tailReverse
+                        ? groups[tailMatch].Select(s => { var t = s.ToList(); t.Reverse(); return t; }).Reverse().ToList()
+                        : groups[tailMatch]);
+                    groups.RemoveAt(tailMatch);
+                }
+                else if (headMatch >= 0)
+                {
+                    var segToAdd = headReverse ? seg.AsEnumerable().Reverse().ToList() : seg;
+                    groups[headMatch].Add(segToAdd);
+                }
+                else if (tailMatch >= 0)
+                {
+                    var segToAdd = tailReverse ? seg.AsEnumerable().Reverse().ToList() : seg;
+                    groups[tailMatch].Insert(0, segToAdd);
                 }
                 else
                 {
-                    bool addedToGroup = false;
-
-                    for (int i = 0; i < intersections.Count; i++)
-                    {
-                        ///ÇØ´ç ±×·ì¿¡ ÇöÀçÀÇ ±³¼±°ú Á¢ÇÏ´Â ºÎºĞÀÌ ÀÖ´ÂÁö È®ÀÎ
-                        ///±×·ìÀÇ Ã³À½ÀÌ³ª ³¡ÀÌ ±³¼±ÀÇ Ã³À½ÀÌ³ª ³¡°ú °°ÀºÁö È®ÀÎÇÏ±â À§ÇØ 4°³ÀÇ °æ¿ìÀÇ ¼ö°¡ ÇÊ¿ä
-
-                        //±×·ìÀÇ ³¡ <=> ±³¼±ÀÇ ½ÃÀÛ : ±³¼± ±×´ë·Î
-                        if (VertexEqual(currentGroup.Last().Last(), intersections[i].First()))
-                        {
-                            currentGroup.Add(intersections[i]);
-                            intersections.RemoveAt(i);
-                            addedToGroup = true;
-                            break;
-                        }
-                        //±×·ìÀÇ ³¡ <=> ±³¼±ÀÇ ³¡ : ±³¼± µÚÁı±â
-                        else if (VertexEqual(currentGroup.Last().Last(), intersections[i].Last()))
-                        {
-                            var temp = intersections[i].ToList();
-                            temp.Reverse();
-                            currentGroup.Add(temp);
-                            intersections.RemoveAt(i);
-                            addedToGroup = true;
-                            break;
-                        }
-                        //±×·ìÀÇ ½ÃÀÛ <=> ±³¼±ÀÇ ³¡ : ±³¼± ±×´ë·Î
-                        else if (VertexEqual(currentGroup.First().First(), intersections[i].Last()))
-                        {
-                            currentGroup.Insert(0, intersections[i]);
-                            intersections.RemoveAt(i);
-                            addedToGroup = true;
-                            break;
-                        }
-                        //±×·ìÀÇ ½ÃÀÛ <=> ±³¼±ÀÇ ½ÃÀÛ : ±³¼± µÚÁı±â
-                        else if (VertexEqual(currentGroup.First().First(), intersections[i].First()))
-                        {
-                            var temp = intersections[i].ToList();
-                            temp.Reverse();
-                            currentGroup.Insert(0, temp);
-                            intersections.RemoveAt(i);
-                            addedToGroup = true;
-                            break;
-                        }
-                    }
-
-                    if (!addedToGroup)
-                    {
-                        groups.Add(currentGroup);
-                        currentGroup = new List<List<Vector3>>();
-                    }
+                    // ë§¤ì¹­ ì—†ìŒ â†’ ìƒˆ ê·¸ë£¹
+                    groups.Add(new List<List<Vector3>> { seg });
                 }
-            }
-
-            if (currentGroup.Count > 0)
-            {
-                groups.Add(currentGroup);
             }
             #endregion
 
             #region ReArrange
-            ///µ¥ÀÌÅÍ Á¤¸®
+            ///ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
             List<Vector3[]> verticesList = new();
             foreach (var group in groups)
             {
-                //Á¡ÁıÇÕ
+                //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
                 List<Vector3> vertexList = new();
                 foreach (var points in group)
                 {
                     vertexList.AddRange(points);
                 }
 
-                //¿¬¼ÓµÈ Á¡Áß °ãÄ¡´Â °Í »èÁ¦
+                //ï¿½ï¿½ï¿½Óµï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
                 for (int i = vertexList.Count - 1; i > 0; i--)
                 {
                     if (VertexEqual(vertexList[i], vertexList[i - 1])) vertexList.RemoveAt(i - 1);
@@ -1388,7 +1373,7 @@ public partial class CrossSectionManager : MonoBehaviour, IUIChecker
             #endregion
 
             #region MakeData
-            //°¢ ±×·ìÀÇ 2D, 3D
+            //ï¿½ï¿½ ï¿½×·ï¿½ï¿½ï¿½ 2D, 3D
             GameObject go = new(meshInfo.ModelType.ToString());
             go.transform.SetParent(goParent);
             gos.Add(go);
@@ -1409,7 +1394,7 @@ public partial class CrossSectionManager : MonoBehaviour, IUIChecker
                 ///Mesh
                 if (meshEnabled)
                 {
-                    //mesh °¡´ÉÇÑÁö Ã¼Å©
+                    //mesh ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Ã¼Å©
                     if (currVertices.Length < 3 ||
                         (currVertices.Length == 3 && !AreaValuable(currVertices[0], currVertices[1], currVertices[2])) ||
                         !VertexEqual(currVertices[0], currVertices[currVertices.Length - 1])) continue;
@@ -1428,7 +1413,7 @@ public partial class CrossSectionManager : MonoBehaviour, IUIChecker
         }
 
         /// <summary>
-        /// ModelType¿¡ µû¸¥ °æ»çµµ ÅØ½ºÆ® Ãß°¡
+        /// ModelTypeï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½çµµ ï¿½Ø½ï¿½Æ® ï¿½ß°ï¿½
         /// </summary>
         /// <param name="modelType"></param>
         /// <param name="vertices"></param>
@@ -1488,7 +1473,7 @@ public partial class CrossSectionManager : MonoBehaviour, IUIChecker
         }
 
         /// <summary>
-        /// Mesh ¸¦ °®´Â GameObject »ı¼º
+        /// Mesh ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ GameObject ï¿½ï¿½ï¿½ï¿½
         /// </summary>
         /// <param name="name"></param>
         /// <param name="transform"></param>
